@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+#set -vx
+
+CHANNEL=$1
+USERNAME=$2
+MESSAGE=$3
+
+PAYLOAD='payload={"channel": "'$CHANNEL'", "username": "'$USERNAME'", "text": "'$MESSAGE'", "icon_emoji": ":ghost:"}'
+
+curl -X POST --data-urlencode "$PAYLOAD" "{{ slack_webhook_url }}"

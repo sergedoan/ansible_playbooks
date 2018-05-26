@@ -1,0 +1,32 @@
+---
+- name: Install java
+  apt:
+    name: default-jre
+    state: present
+
+- name: Download ElasticSearch
+  get_url:
+    url: "{{ elasticsearch_url }}"
+    dest: /usr/local/src/
+
+- name: Install ElasticSearch
+  apt:
+    deb: "/usr/local/src/elasticsearch-{{ elasticsearch_version }}.deb"
+
+- name: Copy config file
+  template:
+    src: elasticsearch.yml.j2
+    dest: /etc/elasticsearch/elasticsearch.yml
+    owner: root
+    group: elasticsearch
+    mode: 0660
+
+- name: Enable ElasticSearch
+  service:
+    name: elasticsearch
+    enabled: yes
+
+- name: Restart ElasticSearch
+  service:
+    name: elasticsearch
+    state: restarted

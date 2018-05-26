@@ -1,0 +1,63 @@
+LoadPlugin network
+LoadPlugin processes
+LoadPlugin aggregation
+
+<LoadPlugin python>
+    Globals true
+</LoadPlugin>
+Interval 30
+
+Hostname "{{ ansible_hostname }} {{ ansible_eth0.ipv4.address | replace('.', '-') }}"
+
+<Plugin aggregation>
+    <Aggregation>
+        Plugin "cpu"
+        Type "cpu"
+
+        GroupBy "Host"
+        GroupBy "TypeInstance"
+
+        CalculateSum true
+        CalculateAverage true
+    </Aggregation>
+</Plugin>
+
+<Plugin cpu>
+  ReportByCpu true
+  ReportByState true
+  ValuesPercentage true
+</Plugin>
+
+<Plugin network>
+    Server "{{ influxdb_server }}" "25826"
+    TimeToLive 128
+    MaxPacketSize 1024
+
+    ReportStats false
+    CacheFlush 1800
+</Plugin>
+
+<Plugin processes>
+    ProcessMatch "puma" ".*puma.*"
+    ProcessMatch "sidekiq" ".*sidekiq.*"
+    ProcessMatch "collectd" ".*collectd.*"
+</Plugin>
+
+<Plugin python>
+    ModulePath "{{ collectd_module_path }}"
+    Import "collectd_iostat_python"
+
+    <Module collectd_iostat_python>
+        Path "/usr/bin/iostat"
+        Interval 2
+        Count 2
+        Verbose false
+        NiceNames false
+        PluginName collectd_iostat_python
+    </Module>
+</Plugin>
+
+# The default Collectd types database
+TypesDB "/usr/share/collectd/types.db"
+# The custom types database
+TypesDB "/usr/share/collectd/iostat_types.db"

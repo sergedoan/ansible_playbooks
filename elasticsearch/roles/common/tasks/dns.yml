@@ -1,0 +1,13 @@
+---
+- name: Make sure we can remove symlink
+  shell: chattr -i /etc/resolv.conf
+  failed_when: false
+
+- name: Remove symlink for /etc/resolv.conf
+  file: path=/etc/resolv.conf state=absent
+
+- name: Use OpenDNS servers
+  copy: src=etc/resolv.conf dest=/etc/resolv.conf mode=0644 owner=root group=root
+
+- name: Make resolv.conf immutable
+  shell: chattr +i /etc/resolv.conf

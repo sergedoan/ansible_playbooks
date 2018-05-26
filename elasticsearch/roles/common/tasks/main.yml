@@ -1,0 +1,49 @@
+---
+- name: Update apt cache
+  apt: update_cache=true cache_valid_time=84600
+
+- name: Auto remove packages
+  apt:
+    autoremove: yes
+
+- name: Install common packages
+  apt: name={{ item }} state=present
+  with_items:
+    - ntp
+    - rkhunter
+    - chkrootkit
+    - fail2ban
+    - logrotate
+    - unattended-upgrades
+    - logwatch
+    - vim
+    - curl
+    - wget
+    - ufw
+
+- name: Use OpenDNS servers
+  include: dns.yml
+
+- name: Add more details to bash history for all user
+  include: bashrc.yml
+
+- stat: path=/usr/local/sbin/snoopy-enable
+  register: snoopy
+
+- name: Install Snoopy to log every executed command to syslog
+  include: snoopy.yml
+  when: snoopy.stat.exists == False
+
+- name: Delete localtime file
+  file: path=/etc/localtime state=absent
+
+- name: Set time zone file
+  file: src=/usr/share/zoneinfo/Asia/Ho_Chi_Minh dest=/etc/localtime state=link
+  notify:
+    - Restart rsyslog
+
+- name: Update alternatives for editor (use vim)
+  alternatives: name=editor path=/usr/bin/vim
+
+- name: Install general firewall rules
+  include: ufw.yml

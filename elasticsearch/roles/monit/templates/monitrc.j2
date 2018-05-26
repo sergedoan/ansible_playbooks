@@ -1,0 +1,30 @@
+set daemon 60
+set logfile /var/log/monit.log
+set pidfile /var/run/monit.pid
+set idfile /var/lib/monit/id
+set statefile /var/lib/monit/state
+set mailserver localhost
+set eventqueue
+    basedir /var/lib/monit/events
+    slots 100
+set httpd port 2812 and
+    use address localhost
+    allow localhost
+
+check filesystem rootfs with path / every 2 cycles
+  if space > 80%
+  then exec "/usr/local/bin/send_alert.sh {{ slack_channel }} '{{ ansible_hostname }} ({{ ansible_eth1.ipv4.address }})' 'WARNING: *root* volume usage is over *80%*'"
+  else if succeeded then exec "/usr/local/bin/send_alert.sh {{ slack_channel }} '{{ ansible_hostname }} ({{ ansible_eth1.ipv4.address }})' '*root* volume usage is back to normal (below 80%)'"
+
+## Check a network link status (up/down), link capacity changes, saturation
+## and bandwidth usage.
+#
+#  check network public with interface eth0
+#    if failed link then alert
+#    if changed link then alert
+#    if saturation > 90% then alert
+#    if download > 10 MB/s then alert
+#    if total upload > 1 GB in last hour then alert
+
+include /etc/monit/conf.d/*
+include /etc/monit/conf-enabled/*

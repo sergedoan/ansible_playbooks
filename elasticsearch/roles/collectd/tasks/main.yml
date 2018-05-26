@@ -1,0 +1,40 @@
+---
+- name: Install sysstat
+  apt:
+    name: sysstat
+    state: present
+
+- name: Install collectd
+  apt:
+    name: collectd
+    state: present
+
+- name: Create module path directory
+  file:
+    path: "{{ collectd_module_path }}"
+    state: directory
+
+- name: Copy collectd_iostat_python script
+  copy:
+    src: collectd_iostat_python.py
+    dest: "{{ collectd_module_path }}/collectd_iostat_python.py"
+
+- name: Copy collectd_iostat_python typesdb
+  copy:
+    src: iostat_types.db
+    dest: "/usr/share/collectd/iostat_types.db"
+
+- name: Copy collectd config
+  copy:
+    src: collectd.conf
+    dest: /etc/collectd/collectd.conf
+
+- name: Copy collectd host config
+  template:
+    src: host.conf.j2
+    dest: /etc/collectd/collectd.conf.d/host.conf
+
+- name: Restart collectd
+  service:
+    name: collectd
+    state: restarted

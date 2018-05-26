@@ -1,0 +1,31 @@
+---
+- name: Enable logging
+  ufw:
+    logging: on
+
+- name: Limit connections to SSH
+  ufw:
+    rule: limit
+    port: ssh
+    proto: tcp
+
+- name: Set firewall default incoming policy
+  ufw:
+    direction: incoming
+    policy: reject
+
+- name: Set firewall default outgoing policy
+  ufw:
+    direction: outgoing
+    policy: allow
+
+- name: Allow access from hosts of the same network
+  ufw:
+    rule: allow
+    src: '{{ item }}'
+  with_items:
+    - 10.0.0.0/8
+
+- name: Enable ufw on boot
+  ufw:
+    state: enabled

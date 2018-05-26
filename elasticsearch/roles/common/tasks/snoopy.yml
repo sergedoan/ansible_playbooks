@@ -1,0 +1,12 @@
+---
+- name: Delete installation file to ensure we have the latest version
+  file: path=/usr/local/src/snoopy-install.sh state=absent
+
+- name: Download Snoopy installation file
+  get_url: url=https://github.com/a2o/snoopy/raw/install/doc/install/bin/snoopy-install.sh dest=/usr/local/src/snoopy-install.sh mode=0755
+
+- name: Install Snoopy (stable version)
+  shell: /usr/local/src/snoopy-install.sh stable
+
+- name: Enable Snoopy
+  shell: snoopy-enable

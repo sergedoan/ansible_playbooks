@@ -1,0 +1,35 @@
+---
+- hosts: elasticsearch
+  become: yes
+  tasks:
+    - name: Install pip
+      apt: 
+        name: python-pip
+        state: present
+    - name: Install elasticsearch-curator
+      pip:
+        name: elasticsearch-curator
+        version: 5.5.2
+
+    - name: Copy config curator
+      copy:
+        src: files/{{ item }}
+        dest: /opt/curator/
+      with_items:
+        - curator.yml
+        - delete_indices.yml
+      tags:
+        - c1
+
+    - name: Create elasticsearch cleanup crontab
+      cron:
+        name: "Delete old index"
+        minute: "0"
+        hour: "3"
+        job: "curator /opt/curator/delete_indices.yml --config /opt/curator/curator.yml"
+
+    - name: Delete old index
+      command: curator /opt/curator/delete_indices.yml --config /opt/curator/curator.yml 
+      tags:
+        - d1
+

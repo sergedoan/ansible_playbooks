@@ -1,0 +1,15 @@
+---
+- name: Increase histsize
+  lineinfile: 'dest={{ bashrc_file }} regexp="^HISTSIZE" line="HISTSIZE={{ bashrc_histsize }}"'
+
+- name: Increase HISTFILESIZE
+  lineinfile: 'dest={{ bashrc_file }} regexp="^HISTFILESIZE" line="HISTFILESIZE={{ bashrc_histfilesize }}"'
+
+- name: Append instead of overwrite the history
+  lineinfile: 'dest={{ bashrc_file }} regexp="^shopt \-s histappend" line="shopt -s histappend"'
+
+- name: Immediately add commands to history
+  lineinfile: 'dest={{ bashrc_file }} regexp="^export PROMPT_COMMAND" line="export PROMPT_COMMAND=\"history -a; history -c; history -r; $PROMPT_COMMAND\""'
+
+- name: Add timestamp for each command
+  lineinfile: 'dest={{ bashrc_file }} regexp="^export HISTTIMEFORMAT" line="export HISTTIMEFORMAT=\"{{ bashrc_histtimeformat }}\""'

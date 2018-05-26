@@ -1,0 +1,27 @@
+---
+- name: Install monit
+  apt:
+    name: monit
+    state: present
+
+- name: Copy alert script
+  template:
+    src: send_alert.sh.j2
+    dest: /usr/local/bin/send_alert.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy monitrc
+  template:
+    src: monitrc.j2
+    dest: /etc/monit/monitrc
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Enable and restart monit
+  service:
+    name: monit
+    enabled: yes
+    state: restarted
