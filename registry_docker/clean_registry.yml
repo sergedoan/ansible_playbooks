@@ -1,0 +1,13 @@
+---
+- hosts: registry
+  tasks:
+    - name: stop container registry
+      shell: docker stop registrycompose_registry_1
+
+    - name: clean data registry
+      file:
+        state: absent
+        path: /data/registry/data/docker/registry
+
+    - name: start container registry
+      shell: docker start registrycompose_registry_1

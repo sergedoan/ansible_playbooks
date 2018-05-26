@@ -1,0 +1,5 @@
+---
+- hosts: registry
+  tasks:
+    - name: docker run registry
+      script: files/registry_run.sh
